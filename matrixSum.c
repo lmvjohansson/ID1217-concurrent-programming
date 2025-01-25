@@ -26,18 +26,6 @@ pthread_cond_t go;        /* condition variable for leaving */
 int numWorkers;           /* number of workers */ 
 int numArrived = 0;       /* number who have arrived */
 
-/* a reusable counter barrier */
-void Barrier() {
-  pthread_mutex_lock(&barrier);
-  numArrived++;
-  if (numArrived == numWorkers) {
-    numArrived = 0;
-    pthread_cond_broadcast(&go);
-  } else
-    pthread_cond_wait(&go, &barrier);
-  pthread_mutex_unlock(&barrier);
-}
-
 /* timer */
 double read_timer() {
     static bool initialized = false;
@@ -54,7 +42,6 @@ double read_timer() {
 
 double start_time, end_time; /* start and end times */
 int size, stripSize;  /* assume size is multiple of numWorkers */
-int sums[MAXWORKERS]; /* partial sums */
 int matrix[MAXSIZE][MAXSIZE]; /* matrix */
 
 void *Worker(void *);
@@ -65,6 +52,7 @@ int main(int argc, char *argv[]) {
   long l; /* use long in case of a 64-bit system */
   pthread_attr_t attr;
   pthread_t workerid[MAXWORKERS];
+  int globalTotal = 0;
 
   /* set global thread attributes */
   pthread_attr_init(&attr);
@@ -103,7 +91,17 @@ int main(int argc, char *argv[]) {
   start_time = read_timer();
   for (l = 0; l < numWorkers; l++)
     pthread_create(&workerid[l], &attr, Worker, (void *) l);
-  pthread_exit(NULL);
+  for (k = 0; k < numWorkers; k++){
+    int *threadResult;
+    pthread_join(workerid[k], (void **)&threadResult);
+    globalTotal += *threadResult;
+    free(threadResult);
+  }
+      /* get end time */
+    end_time = read_timer();
+    /* print results */
+    printf("The total is %d\n", globalTotal);
+    printf("The execution time is %g sec\n", end_time - start_time);
 }
 
 /* Each worker sums the values in one strip of the matrix.
@@ -126,15 +124,6 @@ void *Worker(void *arg) {
     for (j = 0; j < size; j++)
       total += matrix[i][j];
   sums[myid] = total;
-  Barrier();
-  if (myid == 0) {
-    total = 0;
-    for (i = 0; i < numWorkers; i++)
-      total += sums[i];
-    /* get end time */
-    end_time = read_timer();
-    /* print results */
-    printf("The total is %d\n", total);
-    printf("The execution time is %g sec\n", end_time - start_time);
-  }
+  return total;
 }
+
