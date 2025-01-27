@@ -20,13 +20,14 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define MAXSIZE 1000000;
+#define MAXSIZE 5000000;
 
 void quicksort(int array[], int low, int high);
 void *quicksortWorker(void* args);
 
 double start_time, end_time; /* start and end times */
 int arraySize;
+pthread_attr_t attr;
 
 /* timer */
 double read_timer() {
@@ -91,8 +92,8 @@ void quicksort(int array[], int low, int high) {
             rightArgs->low = pivot + 1;
             rightArgs->high = high;
 
-            pthread_create(&leftThread, NULL, quicksortWorker, leftArgs);
-            pthread_create(&rightThread, NULL, quicksortWorker, rightArgs);
+            pthread_create(&leftThread, &attr, quicksortWorker, leftArgs);
+            pthread_create(&rightThread, &attr, quicksortWorker, rightArgs);
 
             pthread_join(leftThread, NULL);
             pthread_join(rightThread, NULL);
@@ -125,7 +126,6 @@ void quicksortSequential(int array[], int low, int high) {
 
 
 int main(int argc, char *argv[]) {
-    pthread_attr_t attr;
     srand(time(NULL)); /* Added to get random seed so the array is not identical each time */
     int i;
 
@@ -157,6 +157,7 @@ int main(int argc, char *argv[]) {
 
     /* print the pthread quicksort array */
     #ifdef DEBUG
+    int printout = arraySize > 20 ? 20 : arraySize;
     printf("[ %d", copy[0]);
     for (i = 1; i < arraySize; i++) {
         printf(", %d", copy[i]);
