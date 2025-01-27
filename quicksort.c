@@ -2,6 +2,9 @@
 
    features: spawns pthreads recursively
 
+   usage under Windows:
+   gcc -o quicksort quicksort.c -lpthread -DDEBUG
+
    usage under Linux:
      gcc quicksort.c -lpthread
      a.out size
@@ -17,10 +20,13 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define MAXSIZE 5000000;
+#define MAXSIZE 1000000;
 
 void quicksort(int array[], int low, int high);
 void *quicksortWorker(void* args);
+
+double start_time, end_time; /* start and end times */
+int arraySize;
 
 /* timer */
 double read_timer() {
@@ -72,7 +78,7 @@ void quicksort(int array[], int low, int high) {
         swap(&array[i + 1], &array[high]); /* Once all elements of subarray has been sorted into smaller and bigger than pivot place pivot in correct position */
         pivot = i + 1;
 
-        if ((high - low) > 100000){ /* Allowing the function to spawn threads for small subarrays causes the overhead of creating the thread to take longer than to let the program run sequentially */  
+        if ((high - low) > (arraySize / 16) && (high - low) > 50000) { /* Allowing the function to spawn threads for small subarrays causes the overhead of creating the thread to take longer than to let the program run sequentially */  
             pthread_t leftThread, rightThread;
 
             struct Arguments* leftArgs = malloc(sizeof(struct Arguments));
@@ -117,18 +123,17 @@ void quicksortSequential(int array[], int low, int high) {
     }
 }
 
-double start_time, end_time; /* start and end times */
 
 int main(int argc, char *argv[]) {
     pthread_attr_t attr;
-    srand(time(NULL)); /* Added to get random seed so the matrix is not identical each time */
+    srand(time(NULL)); /* Added to get random seed so the array is not identical each time */
     int i;
 
     /* set global thread attributes */
     pthread_attr_init(&attr);
     pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 
-    int arraySize = (argc > 1)? atoi(argv[1]) : MAXSIZE;
+    arraySize = (argc > 1)? atoi(argv[1]) : MAXSIZE;
 
     /* Two identical arrays are created */
     int *array = malloc(arraySize * sizeof(int));
@@ -140,15 +145,24 @@ int main(int argc, char *argv[]) {
 
     /* Sequential quicksort is tested on the first array */
     start_time = read_timer();
-    quicksortSequential(array, 0, arraySize);
+    quicksortSequential(array, 0, arraySize - 1);
     end_time = read_timer();
     printf("The execution time for the regular quicksort is %g sec\n", end_time - start_time);
 
     /* Pthread quicksort is tested on the second array */
     start_time = read_timer();
-    quicksort(copy, 0, arraySize);
+    quicksort(copy, 0, arraySize - 1);
     end_time = read_timer();
     printf("The execution time for the pthread quicksort is %g sec\n", end_time - start_time);
+
+    /* print the pthread quicksort array */
+    #ifdef DEBUG
+    printf("[ %d", copy[0]);
+    for (i = 1; i < arraySize; i++) {
+        printf(", %d", copy[i]);
+    }
+    printf(" ]\n");
+    #endif
 
     free(array);
     free(copy);
