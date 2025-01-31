@@ -1,6 +1,10 @@
 /* matrix summation, min asnd max using pthreads
 
    features: uses a bag of tasks and pthread_join before calculating the global min, max and sum in main thread.
+   
+   usage under Windows:
+     gcc -o matrixSum matrixSum.c -lpthread
+     matrixSum size numWorkers
 
    usage under Linux:
      gcc matrixSum.c -lpthread

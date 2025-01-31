@@ -3,7 +3,8 @@
    features: spawns pthreads recursively
 
    usage under Windows:
-   gcc -o quicksort quicksort.c -lpthread -DDEBUG
+     gcc -o quicksort quicksort.c -lpthread -DDEBUG
+     quicksort size
 
    usage under Linux:
      gcc quicksort.c -lpthread
