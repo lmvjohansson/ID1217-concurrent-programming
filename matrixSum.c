@@ -171,13 +171,13 @@ void *Worker(void *arg) {
       result->total += matrix[i][j]; /* Updates partial sum */
       if (matrix[i][j] < result->minimum){ /* Checks if current entry is smaller than min, if so it is recorded */
         result->minimum = matrix[i][j];
-        result->minRow = i+1; /* +1 because matrix notation begins on 1,1 not 0,0 like an array */
-        result->minColumn = j+1;
+        result->minRow = i;
+        result->minColumn = j;
       }
       if (matrix[i][j] > result->maximum){ /* Check if current entry is larger than max, if so it is recorded */
         result->maximum = matrix[i][j];
-        result->maxRow = i+1;
-        result->maxColumn = j+1;
+        result->maxRow = i;
+        result->maxColumn = j;
       }
     }
   }
