@@ -17,7 +17,7 @@
 #include <time.h>
 #include <sys/time.h>
 #define MAXSIZE 10000  /* maximum matrix size */
-#define MAXWORKERS 4   /* maximum number of workers */
+#define MAXWORKERS 10   /* maximum number of workers */
 
 pthread_mutex_t nextRowLock; /* Mutex to protect accessing the nextRow variable */
 int nextRow = 0; /* Global variable to keep track of next row to work on in the matrix, this is the bag of tasks */

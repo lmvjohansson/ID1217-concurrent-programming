@@ -1,0 +1,14 @@
+*.exe
+*.o
+*.out
+*.a
+*.so
+.vscode/
+*.code-workspace
+build/
+debug/
+release/
+*.log
+*.tmp
+tempcoderunnerfile.c
+
