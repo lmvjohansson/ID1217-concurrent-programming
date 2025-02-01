@@ -62,6 +62,7 @@ int main(int argc, char *argv[]) {
   globalResult.maximum = matrix[0][0];
   globalResult.maxRow = 0;
   globalResult.maxColumn = 0;
+  
   start_time = omp_get_wtime();
 
   #pragma omp parallel
