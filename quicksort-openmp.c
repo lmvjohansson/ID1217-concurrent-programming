@@ -13,7 +13,7 @@
 double start_time, end_time;
 
 #include <stdio.h>
-#define MAXSIZE 5000000  /* maximum matrix size */
+#define MAXSIZE 5000000  /* maximum array size */
 #define MAXWORKERS 8   /* maximum number of workers */
 
 int numWorkers;
@@ -41,13 +41,13 @@ void quicksort(int array[], int low, int high) {
         pivot = i + 1;
 
         if ((high - low) > 50000){ /* Thershold to stop spawning too small parallel tasks that cause worse performance */      
-            #pragma omp task
+            #pragma omp task /* Parallel task for each recusive call */
             quicksort(array, low, pivot - 1);
 
             #pragma omp task
             quicksort(array, pivot + 1, high);
 
-            #pragma omp taskwait
+            #pragma omp taskwait /* To ensure all tasks are allowed to complete */
         } else {
             quicksort(array, low, pivot - 1);
             quicksort(array, pivot + 1, high);
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 
     omp_set_num_threads(numWorkers);
 
-    int *array = malloc(size * sizeof(int));
+    int *array = malloc(size * sizeof(int)); /* Create an populate array */
     for (i = 0; i < size; i++) {
         array[i] = rand()%1000000;
     }
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 
     #pragma omp parallel
     {
-        #pragma omp single
+        #pragma omp single /* One thread starts the recursion */
         {
             quicksort(array, 0, size-1);
         }

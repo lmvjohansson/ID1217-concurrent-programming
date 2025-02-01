@@ -21,7 +21,7 @@ int size;
 int matrix[MAXSIZE][MAXSIZE];
 void *Worker(void *);
 
-/* struct to encapsulate the result, returns total sum, min value and its position, max value and its position */
+/* struct to encapsulate the result, returns min value and its position, max value and its position */
 struct Result {
   int minimum;
   int minRow;
@@ -31,7 +31,6 @@ struct Result {
   int maxColumn;
 };
 
-/* read command line, initialize, and create threads */
 int main(int argc, char *argv[]) {
   int i, j, total=0;
   struct Result globalResult;
