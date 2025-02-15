@@ -1,4 +1,5 @@
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class UnisexBathroom {
     public static void main(String[] args) {
@@ -19,6 +20,7 @@ public class UnisexBathroom {
 }
 
 class Bathroom {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SS"); // To limit the number of decimals printed by LocalTime.now()
     private int womenCount = 0;
     private int manCount = 0;
     private int waitingWomen = 0;
@@ -41,12 +43,12 @@ class Bathroom {
             occupiedBy = 'W';
         }
         womenCount++;
-        System.out.println(LocalDateTime.now() + " - Woman " + id + " entered bathroom, number of women in the bathroom is " + womenCount);
+        System.out.println(LocalTime.now().format(formatter) + " - Woman " + id + " entered bathroom, number of women in the bathroom is " + womenCount); // + " number of waiting men " + waitingMen);
     }
 
     public synchronized void womanExit(int id) {
         womenCount--;
-        System.out.println(LocalDateTime.now() + " - Woman " + id + " left bathroom, number of women in the bathroom is " + womenCount);
+        System.out.println(LocalTime.now().format(formatter) + " - Woman " + id + " left bathroom, number of women in the bathroom is " + womenCount); // + " number of waiting men " + waitingMen);
         if (waitingMen > 0) { // Every time a woman exits the queue is checked for men, if there are men waiting they should have the next turn to use bathroom
             nextTurn = 'M';
         } else { // If there is no one waiting the bathroom is open to anyone
@@ -73,12 +75,12 @@ class Bathroom {
             occupiedBy = 'M';
         }
         manCount++;
-        System.out.println(LocalTime.now() + " - Man " + id + " entered bathroom, number of man in the bathroom is " + manCount);
+        System.out.println(LocalTime.now().format(formatter) + " - Man " + id + " entered bathroom, number of men in the bathroom is " + manCount); // + " number of waiting women " + waitingWomen);
     }
 
     public synchronized void manExit(int id) {
         manCount--;
-        System.out.println(LocalDateTime.now() + " - Man " + id + " left bathroom, number of man in the bathroom is " + manCount);
+        System.out.println(LocalTime.now().format(formatter) + " - Man " + id + " left bathroom, number of men in the bathroom is " + manCount); // + " number of waiting women " + waitingWomen);
         if (waitingWomen > 0) {
             nextTurn = 'W';
         } else {
@@ -114,7 +116,7 @@ class Woman implements Runnable {
             bathroom.womanExit(id);
 
             try {
-                Thread.sleep(3000 + (int)(Math.random() * 3000));
+                Thread.sleep(5000 + (int)(Math.random() * 3000));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -145,7 +147,7 @@ class Man implements Runnable {
             bathroom.manExit(id);
 
             try {
-                Thread.sleep(3000 + (int)(Math.random() * 3000)); // Random wait between 1 and 4 seconds
+                Thread.sleep(5000 + (int)(Math.random() * 3000)); // Random wait between 1 and 4 seconds
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
